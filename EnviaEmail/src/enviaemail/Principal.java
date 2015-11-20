@@ -20,11 +20,11 @@ import javax.swing.JTextField;
  */
 public class Principal extends javax.swing.JFrame {
 
-    private Archivo_Class[] lista_adjunto = null;//####
+    private Archivo_Class[] lista_adjunto = null;   //#Lista de adjuntos
 
     public Principal() {
         initComponents();
-        panel_txt_adjunto.setVisible(false);
+        panel_txt_adjunto.setVisible(false);//#panel de adjuntos inicialmente oculto
     }
 
     @SuppressWarnings("unchecked")
@@ -240,81 +240,86 @@ public class Principal extends javax.swing.JFrame {
 
     private void btn_enviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_enviarActionPerformed
         lbl_estado.setForeground(Color.black);
-        JTextField Jpassword = new JPasswordField();
-        Object[] ob = {Jpassword};
+        JTextField Jpassword = new JPasswordField();    //#Crea un elemento de contraseña
+        Object[] ob = {Jpassword};                      //#Obtiene la contraseña
 
-        List<String> destinatatios = Arrays.asList(txt_para.getText().split(","));
-        List<String> CC = Arrays.asList(txt_cc.getText().split(","));
-        List<String> CCO = Arrays.asList(txt_cco.getText().split(","));
+        List<String> destinatatios = Arrays.asList(txt_para.getText().split(","));  //#Agrega los destinararios
+        List<String> CC = Arrays.asList(txt_cc.getText().split(","));               //#Agrega los destinatarios con COPIA
+        List<String> CCO = Arrays.asList(txt_cco.getText().split(","));             //#Agrega los destinatarios con COPIA OCULTA
 
-        destinatatios = destinatatios.get(0).length() > 0 ? destinatatios : null;
-        CC = CC.get(0).length() > 0 ? CC : null;
-        CCO = CCO.get(0).length() > 0 ? CCO : null;
+        destinatatios = destinatatios.get(0).length() > 0 ? destinatatios : null;   //#Si existen destinatarios dejarlo intacto
+                                                                                    //#de lo contrario dejarl la lista en nulo
+        CC = CC.get(0).length() > 0 ? CC : null;        //#Si existen destinatarios con copia dejarlo intacto de lo contrario
+                                                        //dejar la lista nula
+        CCO = CCO.get(0).length() > 0 ? CCO : null;     //#Si existen destinatario con copia oculta dejarlo intacto de lo
+                                                        //#contrario dejar la lista nula
 
-        List<List<String>> contactos = new ArrayList<List<String>>();
-        contactos.add(destinatatios);
+        List<List<String>> contactos = new ArrayList<List<String>>();//#Dejar todos los destinatarios en una sola lista
+        contactos.add(destinatatios);   
         contactos.add(CC);
         contactos.add(CCO);
 
-        if (contactos.get(0) != null) {
+        if (contactos.get(0) != null) { //#Si existe al menos un destinatario
             int result = JOptionPane.showConfirmDialog(null,
                     ob, "Ingrese su contraseña",
-                    JOptionPane.OK_CANCEL_OPTION);
+                    JOptionPane.OK_CANCEL_OPTION);//#Agre interfaz para contraseña
 
-            if (result == JOptionPane.OK_OPTION) {
-                lbl_estado.setText("Estado: Enviando... ");
+            if (result == JOptionPane.OK_OPTION) {  //#Si se ingreso una contraseña
+                lbl_estado.setText("Estado: Enviando... "); //#Cambia estado
 
-                EnviaEmail email = new EnviaEmail();
-                email.origen = txt_desde.getText().trim();
-                email.psswd = Jpassword.getText().trim();
-                email.destino = contactos;
-                email.asunto = txt_asunto.getText().trim();
-                email.cuerpo = textArea_contenido.getText().trim();
-                email.adjunto = lista_adjunto;
+                EnviaEmail email = new EnviaEmail();        //#Instancea la clase EnviaEmail
+                email.origen = txt_desde.getText().trim();  //#Setea el origen del correo
+                email.psswd = Jpassword.getText().trim();   //#Setea la contraseña del correo
+                email.destino = contactos;                  //#Añade la lista de destinatarios, CC y CCO
+                email.asunto = txt_asunto.getText().trim(); //#Setea el asunto del mensaje
+                email.cuerpo = textArea_contenido.getText().trim();//#Setea el contenido textual del mensaje
+                email.adjunto = lista_adjunto;              //#Setea lista de adjuntos
 
-                if (email.enviar()) {
-                    lbl_estado.setForeground(Color.green);
-                    lbl_estado.setText("Estado: Enviado.");
-                } else {
-                    lbl_estado.setForeground(Color.red);
-                    lbl_estado.setText("Estado: Ocurrio un error al enviar.");
+                if (email.enviar()) {                       //#Si se envio correctamente el correo
+                    lbl_estado.setForeground(Color.green);  //#Cambiar color estado
+                    lbl_estado.setText("Estado: Enviado."); //#Cambia el estado
+                } else {                                    //#De lo contrario      
+                    lbl_estado.setForeground(Color.red);    //#Cambia color a rojo
+                    lbl_estado.setText("Estado: Ocurrio un error al enviar.");//#Cambia estado
                 }
             }
-        } else {
+        } else { //#Si no existen destinatarios
             lbl_estado.setForeground(Color.black);
+            //#Muestra mensaje de advertencia
             JOptionPane.showMessageDialog(null, "NO existen destinatarios.");
         }
     }//GEN-LAST:event_btn_enviarActionPerformed
 
     private void btn_adjuntarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_adjuntarActionPerformed
-        JFileChooser fileChooser = new JFileChooser();
+        JFileChooser fileChooser = new JFileChooser();      //#Instancie un componente grafico
         fileChooser.setCurrentDirectory(
                 new File(System.getProperty("user.home"))
-        );
-        fileChooser.setMultiSelectionEnabled(true);
+        );//#Setea una ruta de inicio
+        fileChooser.setMultiSelectionEnabled(true);         //#Se habilita la multiseleccion de archivos
 
-        int result = fileChooser.showOpenDialog(this);
+        int result = fileChooser.showOpenDialog(this);      //#Agre el componente grafico
 
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File[] selectedFile = fileChooser.getSelectedFiles();
-            lista_adjunto = new Archivo_Class[selectedFile.length];
-            String datos = "";
+        if (result == JFileChooser.APPROVE_OPTION) {    //#Si se selecciono algo y se apreto en abrir
+            File[] selectedFile = fileChooser.getSelectedFiles();   //#Obtiene una lista de archivos
+            lista_adjunto = new Archivo_Class[selectedFile.length]; //#Crea un arreglo del tamaño de los archivos seleccionado
+            String datos = "";  //#Resetea nombres de archivos
 
-            for (int i = 0; i < selectedFile.length; i++) {
+            for (int i = 0; i < selectedFile.length; i++) { //#Recorre arreglo de archuivos
                 Archivo_Class archivos = new Archivo_Class(selectedFile[i].getName(),
-                        selectedFile[i].getAbsolutePath());
-                lista_adjunto[i] = archivos;
-                datos += lista_adjunto[i].nombre + "\n";
-            }
-            textArea_adjuntos.setText(datos);
-            panel_txt_adjunto.setVisible(true);
+                        selectedFile[i].getAbsolutePath());//#Crea un objeto tipo Archivo Class donde se 
+                                                            //#pasa como paramteo nombre archivo y ruta
+                lista_adjunto[i] = archivos;            //#Añade archivos a la lista
+                datos += lista_adjunto[i].nombre + "\n";//#Agrega los adatos
+            }//#Fin for
+            textArea_adjuntos.setText(datos);           //#Muestra el nombre de los adjuntos
+            panel_txt_adjunto.setVisible(true);         //#Panel de adjuntos visible
         }
     }//GEN-LAST:event_btn_adjuntarActionPerformed
 
     private void btn_borrar_adjActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_borrar_adjActionPerformed
-        lista_adjunto = null;
-        textArea_adjuntos.setText("");
-        panel_txt_adjunto.setVisible(false);
+        lista_adjunto = null;               //#Resetea la lista de adjuntos
+        textArea_adjuntos.setText("");      //#Resetea el mensaje
+        panel_txt_adjunto.setVisible(false);//#Panel de adjuntos se oculta
     }//GEN-LAST:event_btn_borrar_adjActionPerformed
 
     /**
